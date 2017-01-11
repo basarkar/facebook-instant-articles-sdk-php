@@ -34,7 +34,7 @@ use Facebook\InstantArticles\Validators\Type;
 
 class InstantArticle extends Element implements Container, InstantArticleInterface
 {
-    const CURRENT_VERSION = '1.5.4';
+    const CURRENT_VERSION = '1.3.0';
 
     /**
      * The meta properties that are used on <head>
@@ -80,11 +80,6 @@ class InstantArticle extends Element implements Container, InstantArticleInterfa
      * @var Element[] of all elements an article can have.
      */
     private $children = [];
-
-    /**
-     * @var boolean flag that indicates if this article is Right-to-left(RTL). Defaults to false.
-     */
-    private $isRTLEnabled = false;
 
     /**
      * Factory method
@@ -171,24 +166,6 @@ class InstantArticle extends Element implements Container, InstantArticleInterfa
     }
 
     /**
-     * Updates article to use RTL orientation.
-     */
-    public function enableRTL()
-    {
-        $this->isRTLEnabled = true;
-        return $this;
-    }
-
-    /**
-     * Updates article to use LTR orientation (default), disabling RTL.
-     */
-    public function disableRTL()
-    {
-        $this->isRTLEnabled = false;
-        return $this;
-    }
-
-    /**
      * Sets the header content to this InstantArticle
      *
      * @param Header $header to be added to this Article.
@@ -255,50 +232,6 @@ class InstantArticle extends Element implements Container, InstantArticleInterfa
     }
 
     /**
-     * Adds new child elements to the front of this InstantArticle
-     *
-     * @param Element to be added to this Article.
-     *
-     * @return $this
-     */
-    public function unshiftChild($child)
-    {
-        Type::enforce(
-            $child,
-            [
-                Ad::getClassName(),
-                Analytics::getClassName(),
-                AnimatedGIF::getClassName(),
-                Audio::getClassName(),
-                Blockquote::getClassName(),
-                Image::getClassName(),
-                H1::getClassName(),
-                H2::getClassName(),
-                Interactive::getClassName(),
-                ListElement::getClassName(),
-                Map::getClassName(),
-                Paragraph::getClassName(),
-                Pullquote::getClassName(),
-                RelatedArticles::getClassName(),
-                Slideshow::getClassName(),
-                SocialEmbed::getClassName(),
-                Video::getClassName()
-            ]
-        );
-        array_unshift($this->children, $child);
-
-        return $this;
-    }
-
-    /**
-     * @return string canonicalURL from the InstantArticle
-     */
-    public function getCanonicalURL()
-    {
-        return $this->canonicalURL;
-    }
-
-    /**
      * @return Header header element from the InstantArticle
      */
     public function getHeader()
@@ -349,9 +282,6 @@ class InstantArticle extends Element implements Container, InstantArticleInterfa
 
         // Builds and appends head to the HTML document
         $html = $document->createElement('html');
-        if ($this->isRTLEnabled) {
-            $html->setAttribute('dir', 'rtl');
-        }
         $head = $document->createElement('head');
         $html->appendChild($head);
 

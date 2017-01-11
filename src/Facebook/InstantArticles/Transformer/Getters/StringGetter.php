@@ -17,16 +17,6 @@ class StringGetter extends ChildrenGetter
      */
     protected $attribute;
 
-    /**
-     * @var string
-     */
-    protected $prefix;
-
-    /**
-     * @var string
-     */
-    protected $suffix;
-
     public function createFrom($properties)
     {
         if (isset($properties['selector'])) {
@@ -34,12 +24,6 @@ class StringGetter extends ChildrenGetter
         }
         if (isset($properties['attribute'])) {
             $this->withAttribute($properties['attribute']);
-        }
-        if (isset($properties['prefix'])) {
-            $this->withPrefix($properties['prefix']);
-        }
-        if (isset($properties['suffix'])) {
-            $this->withSuffix($properties['suffix']);
         }
     }
 
@@ -56,32 +40,6 @@ class StringGetter extends ChildrenGetter
         return $this;
     }
 
-    /**
-     * @param string $prefix
-     *
-     * @return $this
-     */
-    public function withPrefix($prefix)
-    {
-        Type::enforce($prefix, Type::STRING);
-        $this->prefix = $prefix;
-
-        return $this;
-    }
-
-    /**
-     * @param string $suffix
-     *
-     * @return $this
-     */
-    public function withSuffix($suffix)
-    {
-        Type::enforce($suffix, Type::STRING);
-        $this->suffix = $suffix;
-
-        return $this;
-    }
-
     public function get($node)
     {
         Type::enforce($node, 'DOMNode');
@@ -89,18 +47,9 @@ class StringGetter extends ChildrenGetter
         if (!empty($elements) && $elements->item(0)) {
             $element = $elements->item(0);
             if ($this->attribute) {
-                $result = $element->getAttribute($this->attribute);
-            } else {
-                $result = $element->textContent;
+                return $element->getAttribute($this->attribute);
             }
-
-            if (!Type::isTextEmpty($this->prefix)) {
-                $result = $this->prefix . $result;
-            }
-            if (!Type::isTextEmpty($this->suffix)) {
-                $result = $result . $this->suffix;
-            }
-            return $result;
+            return $element->textContent;
         }
         return null;
     }

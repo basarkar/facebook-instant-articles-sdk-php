@@ -23,8 +23,9 @@ abstract class Rule
             $log->debug('node matches: '.($matches_node ? 'MATCHES' : 'no match'));
             $log->debug('rule: '.get_class($this));
             $log->debug('-------');
+            return true;
         }
-        if ($node->nodeName === 'iframe') {
+        if ($node->nodeName === 'img') {
             $log->debug('context class: '.get_class($context));
             $log->debug('context matches: '.($matches_context ? 'MATCHES' : 'no match'));
             $log->debug('node name: <'.$node->nodeName.' />');
@@ -33,7 +34,7 @@ abstract class Rule
             $log->debug('rule: '.get_class($this));
             $log->debug('-------');
         }
-        return $matches_context && $matches_node;
+        return false;
     }
 
     abstract public function matchesContext($context);

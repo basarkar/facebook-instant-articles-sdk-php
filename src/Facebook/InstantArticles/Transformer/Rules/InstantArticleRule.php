@@ -44,6 +44,7 @@ class InstantArticleRule extends ConfigurationSelectorRule
         );
 
         return $canonical_rule;
+
     }
 
     public function apply($transformer, $instant_article, $node)

@@ -9,10 +9,8 @@
 namespace Facebook\InstantArticles\Transformer\Rules;
 
 use Facebook\InstantArticles\Elements\Interactive;
-use Facebook\InstantArticles\Elements\Paragraph;
 use Facebook\InstantArticles\Elements\InstantArticle;
 use Facebook\InstantArticles\Transformer\Warnings\InvalidSelector;
-use Facebook\InstantArticles\Validators\Type;
 
 class InteractiveRule extends ConfigurationSelectorRule
 {
@@ -25,21 +23,17 @@ class InteractiveRule extends ConfigurationSelectorRule
 
     public function getContextClass()
     {
-        return
-            [
-                InstantArticle::getClassName(),
-                Paragraph::getClassName()
-            ];
+        return InstantArticle::getClassName();
     }
 
     public static function create()
     {
-        return new static();
+        return new InteractiveRule();
     }
 
     public static function createFrom($configuration)
     {
-        $interactive_rule = static::create();
+        $interactive_rule = self::create();
         $interactive_rule->withSelector($configuration['selector']);
 
         $interactive_rule->withProperties(
@@ -57,27 +51,11 @@ class InteractiveRule extends ConfigurationSelectorRule
         return $interactive_rule;
     }
 
-    public function apply($transformer, $context, $node)
+    public function apply($transformer, $instant_article, $node)
     {
         $interactive = Interactive::create();
 
-        if (Type::is($context, InstantArticle::getClassName())) {
-            $instant_article = $context;
-        } elseif ($transformer->getInstantArticle()) {
-            $instant_article = $transformer->getInstantArticle();
-            $context->disableEmptyValidation();
-            $context = Paragraph::create();
-            $context->disableEmptyValidation();
-        } else {
-            $transformer->addWarning(
-                // This new error message should be something like:
-                // Could not transform Image, as no root InstantArticle was provided.
-                new NoRootInstantArticleFoundWarning(null, $node)
-            );
-            return $context;
-        }
-
-        // Builds the interactive
+        // Builds the image
         $iframe = $this->getProperty(self::PROPERTY_IFRAME, $node);
         $url = $this->getProperty(self::PROPERTY_URL, $node);
         if ($iframe) {
@@ -88,9 +66,6 @@ class InteractiveRule extends ConfigurationSelectorRule
         }
         if ($iframe || $url) {
             $instant_article->addChild($interactive);
-            if ($instant_article !== $context) {
-                $instant_article->addChild($context);
-            }
         } else {
             $transformer->addWarning(
                 new InvalidSelector(
@@ -123,6 +98,6 @@ class InteractiveRule extends ConfigurationSelectorRule
         $transformer->transform($interactive, $node);
         $transformer->suppress_warnings = $suppress_warnings;
 
-        return $context;
+        return $instant_article;
     }
 }

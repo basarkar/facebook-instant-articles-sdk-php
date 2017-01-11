@@ -146,7 +146,14 @@
             },
             {
                 "class": "FooterRelatedArticlesRule",
-                "selector" : "ul.op-related-articles"
+                "selector" : "ul.op-related-articles",
+                "properties" : {
+                    "related.title" : {
+                        "type" : "string",
+                        "selector" : "ul.op-related-articles",
+                        "attribute": "title"
+                    }
+                }
             },
             {
                 "class": "RelatedItemRule",
@@ -206,30 +213,24 @@
             {
                 "class": "TimeRule",
                 "selector" : "time.op-modified",
+                "article.time_type": "op-modified",
                 "properties" : {
                     "article.time" : {
                         "type" : "string",
                         "selector" : "time",
                         "attribute": "datetime"
-                    },
-                    "article.datetype": {
-                        "type": "constant",
-                        "value": "op-modified"
                     }
                 }
             },
             {
                 "class": "TimeRule",
                 "selector" : "time.op-published",
+                "article.time_type": "op-published",
                 "properties" : {
                     "article.time" : {
                         "type" : "string",
                         "selector" : "time",
                         "attribute": "datetime"
-                    },
-                    "article.datetype": {
-                        "type": "constant",
-                        "value": "op-published"
                     }
                 }
             },
@@ -442,22 +443,6 @@
                         "type" : "exists",
                         "selector" : "figure[data-feedback*='fb:likes']",
                         "attribute": "data-feedback"
-                    },
-                    "aspect-fit": {
-                        "type": "exists",
-                        "selector" : "figure[data-mode=aspect-fit]"
-                    },
-                    "aspect-fit-only": {
-                        "type": "exists",
-                        "selector" : "figure[data-mode=aspect-fit-only]"
-                    },
-                    "fullscreen": {
-                        "type": "exists",
-                        "selector" : "figure[data-mode=fullscreen]"
-                    },
-                    "non-interactive": {
-                        "type": "exists",
-                        "selector" : "figure[data-mode=non-interactive]"
                     },
                     "image.comments" : {
                         "type" : "exists",

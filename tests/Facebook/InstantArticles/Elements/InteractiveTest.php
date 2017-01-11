@@ -21,20 +21,17 @@ class InteractiveTest extends \PHPUnit_Framework_TestCase
 
         $rendered = $interactive->render();
         $this->assertEquals($expected, $rendered);
-        $this->assertFalse($interactive->isValid());
     }
 
     public function testRenderBasic()
     {
         $interactive =
             Interactive::create()
-                ->withSource('http://foo.com/interactive-graphic')
-                ->withWidth(640)
-                ->withHeight(300);
+                ->withSource('http://foo.com/interactive-graphic');
 
         $expected =
             '<figure class="op-interactive">'.
-                '<iframe src="http://foo.com/interactive-graphic" width="640" height="300"></iframe>'.
+                '<iframe src="http://foo.com/interactive-graphic"></iframe>'.
             '</figure>';
 
         $rendered = $interactive->render();
@@ -46,8 +43,6 @@ class InteractiveTest extends \PHPUnit_Framework_TestCase
         $social_embed =
             interactive::create()
                 ->withSource('http://foo.com/interactive-graphic')
-                ->withWidth(640)
-                ->withHeight(300)
                 ->withCaption(
                     Caption::create()
                         ->appendText('Some caption to the interactive graphic')
@@ -55,7 +50,7 @@ class InteractiveTest extends \PHPUnit_Framework_TestCase
 
         $expected =
             '<figure class="op-interactive">'.
-                '<iframe src="http://foo.com/interactive-graphic" width="640" height="300"></iframe>'.
+                '<iframe src="http://foo.com/interactive-graphic"></iframe>'.
                 '<figcaption>Some caption to the interactive graphic</figcaption>'.
             '</figure>';
 
@@ -63,32 +58,36 @@ class InteractiveTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $rendered);
     }
 
-    public function testRenderBasicWithOnlyHeight()
+    public function testRenderBasicWithHeight()
     {
         $interactive =
             Interactive::create()
                 ->withSource('http://foo.com/interactive-graphic')
                 ->withHeight(640);
 
-        $expected = '';
+        $expected =
+            '<figure class="op-interactive">'.
+                '<iframe src="http://foo.com/interactive-graphic" height="640"></iframe>'.
+            '</figure>';
 
         $rendered = $interactive->render();
         $this->assertEquals($expected, $rendered);
-        $this->assertFalse($interactive->isValid());
     }
 
-    public function testRenderBasicWithOnlyWidth()
+    public function testRenderBasicWithWidth()
     {
         $interactive =
-            Interactive::create()
-                ->withSource('http://foo.com/interactive-graphic')
-                ->withWidth(640);
+          Interactive::create()
+            ->withSource('http://foo.com/interactive-graphic')
+            ->withWidth(640);
 
-        $expected = '';
+        $expected =
+          '<figure class="op-interactive">' .
+          '<iframe src="http://foo.com/interactive-graphic" width="640"></iframe>' .
+          '</figure>';
 
         $rendered = $interactive->render();
         $this->assertEquals($expected, $rendered);
-        $this->assertFalse($interactive->isValid());
     }
 
     public function testRenderBasicWithWidthHeight()
@@ -101,39 +100,43 @@ class InteractiveTest extends \PHPUnit_Framework_TestCase
 
         $expected =
           '<figure class="op-interactive">' .
-              '<iframe src="http://foo.com/interactive-graphic" width="1600" height="900"></iframe>' .
+          '<iframe src="http://foo.com/interactive-graphic" width="1600" height="900"></iframe>' .
           '</figure>';
 
         $rendered = $interactive->render();
         $this->assertEquals($expected, $rendered);
     }
 
-    public function testRenderBasicWithOnlyColumnWidth()
+    public function testRenderBasicWithColumnWidth()
     {
         $interactive =
             Interactive::create()
                 ->withSource('http://foo.com/interactive-graphic')
                 ->withMargin(Interactive::COLUMN_WIDTH);
 
-        $expected = '';
+        $expected =
+            '<figure class="op-interactive">'.
+                '<iframe src="http://foo.com/interactive-graphic" class="column-width"></iframe>'.
+            '</figure>';
 
         $rendered = $interactive->render();
         $this->assertEquals($expected, $rendered);
-        $this->assertFalse($interactive->isValid());
     }
 
-    public function testRenderBasicWithOnlyNoMargin()
+    public function testRenderBasicWithNoMargin()
     {
         $interactive =
             Interactive::create()
                 ->withSource('http://foo.com/interactive-graphic')
                 ->withMargin(Interactive::NO_MARGIN);
 
-        $expected = '';
+        $expected =
+            '<figure class="op-interactive">'.
+                '<iframe src="http://foo.com/interactive-graphic" class="no-margin"></iframe>'.
+            '</figure>';
 
         $rendered = $interactive->render();
         $this->assertEquals($expected, $rendered);
-        $this->assertFalse($interactive->isValid());
     }
 
     public function testRenderInlineWithHeightAndWidth()
@@ -145,13 +148,12 @@ class InteractiveTest extends \PHPUnit_Framework_TestCase
         $interactive =
             Interactive::create()
                 ->withHTML($inline)
-                ->withWidth(600)
                 ->withHeight(640)
                 ->withMargin(Interactive::NO_MARGIN);
 
         $expected =
             '<figure class="op-interactive">'.
-                '<iframe class="no-margin" width="600" height="640">'.
+                '<iframe class="no-margin" height="640">'.
                     '<h1>Some custom code</h1>'.
                     '<script>alert("test & more test");</script>'.
                 '</iframe>'.
@@ -159,29 +161,5 @@ class InteractiveTest extends \PHPUnit_Framework_TestCase
 
         $rendered = $interactive->render();
         $this->assertEquals($expected, $rendered);
-    }
-
-    public function testRenderInline()
-    {
-        $inline =
-            '<h1>Some custom code</h1>'.
-            '<script>alert("test & more test");</script>';
-
-        $interactive =
-            Interactive::create()
-                ->withHTML($inline)
-                ->withMargin(Interactive::NO_MARGIN);
-
-        $expected =
-            '<figure class="op-interactive">'.
-                '<iframe class="no-margin">'.
-                    '<h1>Some custom code</h1>'.
-                    '<script>alert("test & more test");</script>'.
-                '</iframe>'.
-            '</figure>';
-
-        $rendered = $interactive->render();
-        $this->assertEquals($expected, $rendered);
-        $this->assertTrue($interactive->isValid());
     }
 }

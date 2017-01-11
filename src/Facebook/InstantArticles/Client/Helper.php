@@ -61,13 +61,12 @@ class Helper
      * short-lived user access token.
      *
      * @param AccessToken $accessToken A short-lived user access token.
-     * @param int         $offset      Offset pages API results
      *
      * @return array
      *
      * @throws FacebookSDKException
      */
-    public function getPagesAndTokens($accessToken, $offset = 0)
+    public function getPagesAndTokens($accessToken)
     {
         Type::enforce($accessToken, 'Facebook\Authentication\AccessToken');
 
@@ -90,7 +89,7 @@ class Helper
         // Request the list of pages and associated page tokens that are
         // connected to this user
         try {
-            $response = $this->facebook->get('/me/accounts?fields=name,id,access_token,supports_instant_articles,picture&offset=' . $offset);
+            $response = $this->facebook->get('/me/accounts?fields=name,id,access_token,supports_instant_articles');
         } catch (FacebookResponseException $e) {
             throw new FacebookSDKException('Graph API returned an error: ' . $e->getMessage());
         }

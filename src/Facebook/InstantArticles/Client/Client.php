@@ -88,7 +88,7 @@ class Client
      *
      * @return int The submission status ID. It is not the article ID. (Since 1.3.0)
      */
-    public function importArticle($article, $published = false, $forceRescrape = false)
+    public function importArticle($article, $published = false)
     {
         Type::enforce($article, 'Facebook\InstantArticles\Elements\InstantArticleInterface');
         Type::enforce($published, Type::BOOLEAN);
@@ -103,25 +103,7 @@ class Client
           'development_mode' => $this->developmentMode,
         ]);
 
-        if ($forceRescrape) {
-            // Re-scrape Graph object for article URL
-            $this->scrapeArticleURL($article->getCanonicalURL());
-        }
-
         return $response->getGraphNode()->getField('id');
-    }
-
-    /**
-     * Scrape Graph object for given URL
-     *
-     * @param string $canonicalURL The URL that will be scraped.
-     */
-    private function scrapeArticleURL($canonicalURL)
-    {
-        $this->facebook->post('/', [
-            'id' => $canonicalURL,
-            'scrape' => 'true',
-        ]);
     }
 
     /**
@@ -259,43 +241,5 @@ class Client
         }
 
         return $articleURLs;
-    }
-
-    /**
-     * Claims an URL for the page
-     *
-     * @param string $url The root URL of the site
-     */
-    public function claimURL($url)
-    {
-        // Remove protocol from the URL
-        $url = preg_replace('/^https?:\/\//i', '', $url);
-        $response = $this->facebook->post($this->pageID . '/claimed_urls?url=' . urlencode($url));
-        $node = $response->getGraphNode();
-        $error = $node->getField('error');
-        $success = $node->getField('success');
-        if ($error) {
-            throw new ClientException($error['error_user_msg']);
-        }
-        if (!$success) {
-            throw new ClientException('Could not claim the URL');
-        }
-    }
-
-    /**
-     * Submits the page for review
-     */
-    public function submitForReview()
-    {
-        $response = $this->facebook->post($this->pageID . '/?instant_articles_submit_for_review=true');
-        $node = $response->getGraphNode();
-        $error = $node->getField('error');
-        $success = $node->getField('success');
-        if ($error) {
-            throw new ClientException($error['error_user_msg']);
-        }
-        if (!$success) {
-            throw new ClientException('Could not submit for review');
-        }
     }
 }

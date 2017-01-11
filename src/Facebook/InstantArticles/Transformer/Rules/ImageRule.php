@@ -9,10 +9,8 @@
 namespace Facebook\InstantArticles\Transformer\Rules;
 
 use Facebook\InstantArticles\Elements\Image;
-use Facebook\InstantArticles\Elements\Paragraph;
 use Facebook\InstantArticles\Elements\InstantArticle;
 use Facebook\InstantArticles\Transformer\Warnings\InvalidSelector;
-use Facebook\InstantArticles\Validators\Type;
 
 class ImageRule extends ConfigurationSelectorRule
 {
@@ -20,39 +18,26 @@ class ImageRule extends ConfigurationSelectorRule
     const PROPERTY_LIKE = 'image.like';
     const PROPERTY_COMMENTS = 'image.comments';
 
-    const ASPECT_FIT = 'aspect-fit';
-    const ASPECT_FIT_ONLY = 'aspect-fit-only';
-    const FULLSCREEN = 'fullscreen';
-    const NON_INTERACTIVE = 'non-interactive';
-
     public function getContextClass()
     {
-        return
-            [
-                InstantArticle::getClassName(),
-                Paragraph::getClassName()
-            ];
+        return InstantArticle::getClassName();
     }
 
     public static function create()
     {
-        return new static();
+        return new ImageRule();
     }
 
     public static function createFrom($configuration)
     {
-        $image_rule = static::create();
+        $image_rule = self::create();
         $image_rule->withSelector($configuration['selector']);
 
         $image_rule->withProperties(
             [
                 self::PROPERTY_IMAGE_URL,
                 self::PROPERTY_LIKE,
-                self::PROPERTY_COMMENTS,
-                self::ASPECT_FIT,
-                self::ASPECT_FIT_ONLY,
-                self::FULLSCREEN,
-                self::NON_INTERACTIVE
+                self::PROPERTY_COMMENTS
             ],
             $configuration
         );
@@ -60,34 +45,15 @@ class ImageRule extends ConfigurationSelectorRule
         return $image_rule;
     }
 
-    public function apply($transformer, $context, $node)
+    public function apply($transformer, $instant_article, $node)
     {
         $image = Image::create();
-
-        if (Type::is($context, InstantArticle::getClassName())) {
-            $instant_article = $context;
-        } elseif ($transformer->getInstantArticle()) {
-            $instant_article = $transformer->getInstantArticle();
-            $context->disableEmptyValidation();
-            $context = Paragraph::create();
-            $context->disableEmptyValidation();
-        } else {
-            $transformer->addWarning(
-                // This new error message should be something like:
-                // Could not transform Image, as no root InstantArticle was provided.
-                new NoRootInstantArticleFoundWarning(null, $node)
-            );
-            return $context;
-        }
 
         // Builds the image
         $url = $this->getProperty(self::PROPERTY_IMAGE_URL, $node);
         if ($url) {
             $image->withURL($url);
             $instant_article->addChild($image);
-            if ($instant_article !== $context) {
-                $instant_article->addChild($context);
-            }
         } else {
             $transformer->addWarning(
                 new InvalidSelector(
@@ -97,16 +63,6 @@ class ImageRule extends ConfigurationSelectorRule
                     $this
                 )
             );
-        }
-
-        if ($this->getProperty(Image::ASPECT_FIT, $node)) {
-            $image->withPresentation(Image::ASPECT_FIT);
-        } elseif ($this->getProperty(Image::ASPECT_FIT_ONLY, $node)) {
-            $image->withPresentation(Image::ASPECT_FIT_ONLY);
-        } elseif ($this->getProperty(Image::FULLSCREEN, $node)) {
-            $image->withPresentation(Image::FULLSCREEN);
-        } elseif ($this->getProperty(Image::NON_INTERACTIVE, $node)) {
-            $image->withPresentation(Image::NON_INTERACTIVE);
         }
 
         if ($this->getProperty(self::PROPERTY_LIKE, $node)) {
@@ -122,6 +78,6 @@ class ImageRule extends ConfigurationSelectorRule
         $transformer->transform($image, $node);
         $transformer->suppress_warnings = $suppress_warnings;
 
-        return $context;
+        return $instant_article;
     }
 }

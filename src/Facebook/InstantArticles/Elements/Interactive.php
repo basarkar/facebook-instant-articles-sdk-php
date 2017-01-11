@@ -250,7 +250,7 @@ class Interactive extends ElementWithHTML implements Container
      */
     public function isValid()
     {
-        return $this->html || (!Type::isTextEmpty($this->source) && $this->height && $this->width);
+        return !Type::isTextEmpty($this->source) || $this->html;
     }
 
     /**
